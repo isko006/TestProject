@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 
 from .serialaizers import *
@@ -12,7 +12,7 @@ from .models import *
 
 
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def movies_list_view(request):
     if request.method == 'POST':
         serializer = MovieCreateValidateSerializer(data=request.data)
@@ -28,7 +28,6 @@ def movies_list_view(request):
         age_restriction = request.data.get('age_restriction', '')
         movie = Movie.objects.create(name=name, duration=duration,
                                      date=date, age_restriction=age_restriction)
-        movie.genres.set(request.data['genres'])
         movie.save()
         return Response(data={'message': 'you created movie!',
                               'movie': MovieListSerializer(movie).data})
@@ -40,6 +39,7 @@ def movies_list_view(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def movies_item_view(request, pk):
     movie = Movie.objects.get(id=pk)
     if request.method == 'DELETE':
