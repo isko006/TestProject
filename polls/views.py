@@ -39,7 +39,6 @@ def movies_list_view(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticated])
 def movies_item_view(request, pk):
     movie = Movie.objects.get(id=pk)
     if request.method == 'DELETE':
