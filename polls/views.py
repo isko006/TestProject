@@ -39,6 +39,7 @@ def movies_list_view(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def movies_item_view(request, pk):
     movie = Movie.objects.get(id=pk)
     if request.method == 'DELETE':
@@ -51,9 +52,9 @@ def movies_item_view(request, pk):
         movie.age_restriction = request.data.get('age_restriction')
         movie.save()
         return Response(data={'massage': 'Movie updated',
-                              'movie': MovieListSerializer(movie).data})
+                              'movie': MovieListSerializer(Movie).data})
 
-    data = MovieListSerializer(movie, many=False).data
+    data = MovieListSerializer(movie, many=True).data
     return Response(data=data)
 
 
@@ -73,6 +74,9 @@ def login(request):
             return Response(data={
                 'massage': 'User not found!!!'
             }, status=status.HTTP_404_NOT_FOUND)
+
+
+
 
 
 @api_view(['POST'])
